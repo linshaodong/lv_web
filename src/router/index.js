@@ -66,7 +66,7 @@ export const asyncRouterMap = [
     component: Layout,
     redirect: 'noredirect',
     name: '系统管理',
-    key: 'system', // 权限判断使用
+    key: '1', // 权限判断使用
     meta: {
       title: '系统管理',
       icon: 'tree'
@@ -75,7 +75,7 @@ export const asyncRouterMap = [
       path: 'permission',
       component: () => import('@/views/system/permission'),
       name: '权限列表',
-      key: 'system_permission',
+      key: '21',
       meta: {
         title: '权限列表',
         icon: 'lock'
@@ -84,7 +84,7 @@ export const asyncRouterMap = [
       path: 'role',
       component: () => import('@/views/system/role'),
       name: '角色列表',
-      key: 'system_role',
+      key: '7',
       meta: {
         title: '角色列表',
         icon: 'table'
@@ -93,7 +93,7 @@ export const asyncRouterMap = [
         path: 'listpage',
         hidden: true,
         name: '查看列表',
-        key: 'system_role_listpage',
+        key: '',
         children: [{
           path: 'total',
           hidden: true,
@@ -103,29 +103,25 @@ export const asyncRouterMap = [
       }, {
         path: 'add',
         hidden: true,
-        name: '添加',
-        key: 'system_role_add'
+        name: '添加'
       }, {
         path: 'edit',
         hidden: true,
-        name: '编辑',
-        key: 'system_role_edit'
+        name: '编辑'
       }, {
         path: 'remove',
         hidden: true,
-        name: '删除',
-        key: 'system_role_remove'
+        name: '删除'
       }, {
         path: 'batchRemove',
         hidden: true,
-        name: '批量删除',
-        key: 'system_role_batchRemove'
+        name: '批量删除'
       }]
     }, {
       path: 'user',
       component: () => import('@/views/system/user'),
       name: '用户列表',
-      key: 'system_user',
+      key: '33',
       meta: {
         title: '用户列表',
         icon: 'peoples'
@@ -133,34 +129,29 @@ export const asyncRouterMap = [
       children: [{
         path: 'listpage',
         hidden: true,
-        name: '查看列表',
-        key: 'system_user_listpage'
+        name: '查看列表'
       }, {
         path: 'add',
         hidden: true,
-        name: '添加',
-        key: 'system_user_add'
+        name: '添加'
       }, {
         path: 'edit',
         hidden: true,
-        name: '编辑',
-        key: 'system_user_edit'
+        name: '编辑'
       }, {
         path: 'remove',
         hidden: true,
-        name: '删除',
-        key: 'system_user_remove'
+        name: '删除'
       }, {
         path: 'batchRemove',
         hidden: true,
-        name: '批量删除',
-        key: 'system_user_batchRemove'
+        name: '批量删除'
       }]
     }, {
       path: 'log',
       component: () => import('@/views/system/log'),
       name: '操作日志',
-      key: 'system_log',
+      key: '13',
       meta: {
         title: '操作日志',
         icon: 'form'

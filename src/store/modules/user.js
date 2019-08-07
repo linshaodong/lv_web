@@ -8,6 +8,7 @@ import {
 const user = {
   state: {
     token: getToken(),
+    userId: 0,
     name: '',
     avatar: '',
     roles: [],
@@ -26,6 +27,10 @@ const user = {
   mutations: {
     SET_TOKEN: (state, token) => {
       state.token = token
+    },
+    SET_USER_ID: (state, token) => {
+      var arr = token.split('|')
+      state.userId = arr[2]
     },
     SET_NAME: (state, name) => {
       state.name = name
@@ -80,6 +85,7 @@ const user = {
           const data = response
           setToken(data.token)
           commit('SET_TOKEN', data.token)
+          commit('SET_USER_ID', data.token)
           resolve()
         }).catch(error => {
           reject(error)

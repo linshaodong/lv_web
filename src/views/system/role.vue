@@ -55,7 +55,7 @@
                     class="el-form-permisson-item"
                     :props="props"
                     :data="permissions"
-                    node-key="key"
+                    node-key="id"
                     default-expand-all
                     show-checkbox
                     @check-change="handleCheckChange">
@@ -73,7 +73,6 @@
 </template>
 
 <script>
-import { asyncRouterMap } from '@/router/index.js'
 import {
   getRoleListPage,
   removeRole,
@@ -81,13 +80,16 @@ import {
   editRole,
   addRole
 } from '@/api/role-table'
+import {
+  getTotal as getPermissions
+} from '@/api/permission-table'
 
 export default {
   data() {
     return {
       loading: true,
       // 权限
-      permissions: asyncRouterMap,
+      permissions: [],
       props: {
         label: 'name',
         children: 'children'
@@ -127,15 +129,15 @@ export default {
     rolePermissionsChange(data, checked, indeterminate) {
       console.log(data, checked, indeterminate)
       if (checked) {
-        console.log('add:' + data.key)
-        var exists = this.rolePermissions.indexOf(data.key)
+        console.log('add:' + data.id)
+        var exists = this.rolePermissions.indexOf(data.id)
 
         if (exists <= -1) {
-          this.rolePermissions.push(data.key)
+          this.rolePermissions.push(data.id)
         }
       } else {
-        console.log('del:' + data.key)
-        var index = this.rolePermissions.indexOf(data.key)
+        console.log('del:' + data.id)
+        var index = this.rolePermissions.indexOf(data.id)
         if (index > -1) {
           this.rolePermissions.splice(index, 1)
         }
@@ -186,7 +188,6 @@ export default {
 
       this.defaultId = row.id
       var defaultPermissions = JSON.parse(row.permission)
-
       var that = this
       setTimeout(function() { that.$refs.tree.setCheckedKeys(defaultPermissions) }, 50)
     },
@@ -208,11 +209,10 @@ export default {
           this.$confirm('确认提交吗？', '提示', {})
             .then(() => {
               const para = {
-                id: this.defaultId,
                 name: this.editForm.name,
                 rolePermissions: this.rolePermissions
               }
-              editRole(para).then(res => {
+              editRole(this.defaultId, para).then(res => {
                 this.$message({
                   message: '提交成功',
                   type: 'success'
@@ -278,11 +278,18 @@ export default {
           })
         })
         .catch(() => {})
+    },
+    getList() {
+      getPermissions().then(res => {
+        this.permissions = res.list
+      }).catch(() => {
+
+      })
     }
   },
   mounted() {
     this.getRoles()
-    console.log(this.permissions)
+    this.getList()
   }
 }
 </script>

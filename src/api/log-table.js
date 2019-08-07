@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function getLogListPage(params) {
   return request({
-    url: '/system/log',
+    url: '/lv/logs',
     method: 'get',
     params: params
   })

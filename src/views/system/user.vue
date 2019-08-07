@@ -231,7 +231,6 @@ export default {
     formatRoles(row, column) {
       var rolesName = []
       var roles = JSON.parse(row.roles)
-      console.log(roles)
       for (var i = 0; i < this.total_roles.length; i++) {
         for (var j = 0; j < roles.length; j++) {
           if (this.total_roles[i].id === parseInt(roles[j])) {
@@ -297,7 +296,6 @@ export default {
 
       setTimeout(() => {
         this.$refs.editForm.clearValidate()
-        console.log(this.$refs)
       }, 100)
     },
     // 显示新增界面

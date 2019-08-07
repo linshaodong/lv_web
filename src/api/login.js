@@ -1,8 +1,9 @@
 import request from '@/utils/request'
+import store from '@/store'
 
 export function login(user_name, password) {
   return request({
-    url: '/system/user/login',
+    url: '/lv/tokens',
     method: 'post',
     data: {
       user_name,
@@ -11,17 +12,16 @@ export function login(user_name, password) {
   })
 }
 
-export function getInfo(token) {
+export function getInfo() {
   return request({
-    url: '/system/user/info',
-    method: 'get',
-    params: { token }
+    url: '/lv/users/' + store.getters.userId,
+    method: 'get'
   })
 }
 
 export function logout() {
   return request({
-    url: '/system/user/logout',
-    method: 'post'
+    url: '/lv/tokens/' + store.getters.userId,
+    method: 'delete'
   })
 }

@@ -7,7 +7,7 @@ import { asyncRouterMap, constantRouterMap } from '@/router'
  */
 function hasPermission(permissions, route) {
   if (route.meta && route.key) {
-    return permissions.indexOf(route.key) >= 0
+    return permissions.indexOf(parseInt(route.key)) >= 0
   } else {
     return true
   }

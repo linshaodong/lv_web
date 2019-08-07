@@ -59,7 +59,7 @@ export default {
       imgSrc: '',
       cropImg: '',
       dialogVisible: false,
-      upload_url: process.env.BASE_API + '/upload',
+      upload_url: process.env.BASE_API + '/lv/uploads',
       myHeaders: {
         'X-Token': getToken()
       }
