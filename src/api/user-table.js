@@ -29,7 +29,7 @@ export function editUser(params) {
 }
 export function addUser(params) {
   return request({
-    url: '/lv/users/',
+    url: '/lv/users',
     method: 'post',
     params: params
   })

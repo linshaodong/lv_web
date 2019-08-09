@@ -77,7 +77,7 @@
 
         </el-form>
         <div slot="footer" class="dialog-footer">
-          <el-button @click.native="dialogFormVisible=false">取消</el-button>
+          <el-button @click.native="resetForm()">取消</el-button>
           <el-button type="primary" @click="updateData">修改</el-button>
         </div>
       </el-dialog>
@@ -153,6 +153,10 @@ export default {
     this.getList()
   },
   methods: {
+    resetForm() {
+      this.dialogFormVisible = false
+      this.$refs['editForm'].resetFields()
+    },
     tableRowClassName({ row, rowIndex }) {
       if (row.is_show === 1) {
         return 'nav-row'

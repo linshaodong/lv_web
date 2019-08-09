@@ -29,7 +29,11 @@
 		</el-col>
 
 		<!--列表-->
-		<el-table v-loading="loading" :data="users" highlight-current-row @selection-change="selsChange" style="width: 100%;">
+		<el-table v-loading="loading" :data="users" highlight-current-row 
+    @selection-change="selsChange"
+    @sort-change="sortChange"
+    :default-sort = "{prop: 'updated_at', order: 'descending'}"
+     style="width: 100%;">
 			<el-table-column type="selection" width="55"></el-table-column>
 			<el-table-column type="index" width="60"></el-table-column>
 			<el-table-column prop="name" label="姓名"></el-table-column>
@@ -38,7 +42,7 @@
       <el-table-column prop="roles" label="角色" :formatter="formatRoles"></el-table-column>
       <el-table-column prop="last_ip" label="最后登录ip"></el-table-column>
 			<el-table-column prop="created_at" label="创建时间"></el-table-column>
-			<el-table-column prop="updated_at" label="修改时间"></el-table-column>
+			<el-table-column prop="updated_at" label="修改时间" sortable></el-table-column>
 			<el-table-column label="操作" width="150">
 				<template slot-scope="scope">
 					<el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
@@ -54,7 +58,7 @@
 		<el-dialog v-if="dialogStatus=='create'" 
       :title="textMap[dialogStatus]" 
       :visible.sync="dialogFormVisibleAdd" 
-      :close-on-click-modal="false" 
+      :show-close="false" 
       width="50%">
 			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
 				<el-form-item label="姓名" prop="name">
@@ -66,7 +70,13 @@
 				</el-form-item>
 
         <el-form-item label="密码" prop="password">
-					<el-input v-model="addForm.password" type="password" auto-complete="off" placeholder="密码长度最少为8位数"></el-input>
+					<el-input v-model="addForm.password" type="password" auto-complete="off" style="width:50%; float:left;"></el-input>
+          <el-row type="flex" class="row-bg" style="width:50%; float:left;top:25px;padding-left: 5px;">
+            <el-col class="pwd"><div :class="pwd1"></div></el-col>
+            <el-col class="pwd"><div :class="pwd2"></div></el-col>
+            <el-col class="pwd"><div :class="pwd3"></div></el-col>
+          </el-row>
+          <span class="pwd-str">{{ pwdLevel }}</span>
 				</el-form-item>
 
         <el-form-item label="重复密码" prop="re_password">
@@ -82,7 +92,7 @@
 
 			</el-form>
 			<div slot="footer" class="dialog-footer">
-			 <el-button @click.native="closeForm()">取消</el-button>
+			 <el-button @click.native="resetForm('addForm')">取消</el-button>
 			    <el-button type="primary" @click="createData">添加</el-button>
 			</div>
 		</el-dialog>
@@ -91,7 +101,7 @@
 		<el-dialog v-if="dialogStatus!='create'" 
       :title="textMap[dialogStatus]" 
       :visible.sync="dialogFormVisible" 
-      :close-on-click-modal="false" 
+      :show-close="false" 
       width="50%">
 			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
 				<el-form-item label="姓名" prop="name">
@@ -113,7 +123,13 @@
         </el-form-item>
 
         <el-form-item label="密码" prop="password">
-					<el-input v-model="editForm.password" type="password" auto-complete="off" placeholder="密码长度最少为8位数"></el-input>
+					<el-input v-model="editForm.password" type="password" auto-complete="off"  style="width:50%; float:left;"></el-input>
+          <el-row type="flex" class="row-bg" style="width:50%; float:left;top:25px;padding-left: 5px;">
+            <el-col class="pwd"><div :class="pwd1"></div></el-col>
+            <el-col class="pwd"><div :class="pwd2"></div></el-col>
+            <el-col class="pwd"><div :class="pwd3"></div></el-col>
+          </el-row>
+          <span class="pwd-str">{{ pwdLevel }}</span>
 				</el-form-item>
 
         <el-form-item label="重复密码" prop="re_password">
@@ -129,7 +145,7 @@
 
 			</el-form>
 			<div slot="footer" class="dialog-footer">
-			 <el-button @click.native="dialogFormVisible=false">取消</el-button>
+			 <el-button @click.native="resetForm('editForm')">取消</el-button>
                 <el-button type="primary" @click="updateData">修改</el-button>
 			</div>
 		</el-dialog>
@@ -150,7 +166,74 @@ import {
 
 export default {
   data() {
+    var checkPwd = (rule, value, callback) => {
+      // eslint-disable-next-line space-unary-ops
+      if (! rule.required && value === '') {
+        return callback()
+      }
+
+      console.log(rule)
+      if (value.length <= 8) {
+        this.pwdLevel = ''
+        this.pwd1 = 'grid-content bg-purple pwd-color'
+        this.pwd2 = 'grid-content bg-purple pwd-color'
+        this.pwd3 = 'grid-content bg-purple pwd-color'
+        return callback(new Error('密码需要大于8位'))
+      // eslint-disable-next-line space-unary-ops
+      } else if (! value.match(/^[A-Za-z0-9]+$/)) {
+        this.pwdLevel = ''
+        this.pwd1 = 'grid-content bg-purple pwd-color'
+        this.pwd2 = 'grid-content bg-purple pwd-color'
+        this.pwd3 = 'grid-content bg-purple pwd-color'
+        return callback(new Error('密码只能英文字母和数字'))
+      }
+
+      var level = 0
+      if (value.match(/[A-Z]/)) {
+        level = level + 1
+      }
+      if (value.match(/[a-z]/)) {
+        level = level + 1
+      }
+      if (value.match(/[0-9]/)) {
+        level = level + 1
+      }
+
+      if (level === 1) {
+        this.pwdLevel = '弱'
+        this.pwd1 = 'grid-content bg-purple pwd-color danger'
+        this.pwd2 = 'grid-content bg-purple pwd-color'
+        this.pwd3 = 'grid-content bg-purple pwd-color'
+      } else if (level === 2) {
+        this.pwdLevel = '中'
+        this.pwd1 = 'grid-content bg-purple pwd-color warning'
+        this.pwd2 = 'grid-content bg-purple pwd-color warning'
+        this.pwd3 = 'grid-content bg-purple pwd-color'
+      } else if (level === 3) {
+        this.pwdLevel = '强'
+        this.pwd1 = 'grid-content bg-purple pwd-color success'
+        this.pwd2 = 'grid-content bg-purple pwd-color success'
+        this.pwd3 = 'grid-content bg-purple pwd-color success'
+      }
+
+      return callback()
+    }
+
+    var rePwd = (rule, value, callback) => {
+      var pwd = this.addForm.password !== '' ? this.addForm.password : this.editForm.password
+
+      if (value !== pwd) {
+        return callback(new Error('俩次密码不一致'))
+      }
+
+      return callback()
+    }
+
     return {
+      pwdLevel: '',
+      pwd1: 'grid-content bg-purple pwd-color',
+      pwd2: 'grid-content bg-purple pwd-color',
+      pwd3: 'grid-content bg-purple pwd-color',
       loading: true,
       total_roles: [],
       dialogStatus: '',
@@ -189,6 +272,7 @@ export default {
       total: 0,
       page: 1,
       sels: [], // 列表选中列
+      orderBy: '',
 
       // 编辑界面数据
       editForm: {
@@ -203,7 +287,10 @@ export default {
         name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
         user_name: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
         user_roles: [{ required: true, message: '请选择角色', trigger: 'blur' }],
-        password: [{ min: 8, message: '密码长度最少为8位数', trigger: 'blur' }]
+        password: [
+          { required: false, validator: checkPwd, trigger: 'blur' }
+        ],
+        re_password: [{ required: false, validator: rePwd, trigger: 'blur' }]
       },
 
       addForm: {
@@ -216,17 +303,19 @@ export default {
       addFormRules: {
         name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
         user_name: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-        password: [{ required: true, message: '请输入密码', trigger: 'blur' }, { min: 8, message: '密码长度最少为8位数', trigger: 'blur' }],
-        re_password: [{ required: true, message: '请输入重复密码', trigger: 'blur' }],
+        password: [
+          { required: true, validator: checkPwd, trigger: 'blur' }
+        ],
+        re_password: [{ required: true, validator: rePwd, trigger: 'blur' }],
         user_roles: [{ required: true, message: '请选择角色', trigger: 'blur' }]
       }
     }
   },
   methods: {
-    closeForm() {
-      this.$refs.addForm.resetFields()
-      this.$refs.addForm.clearValidate()
+    resetForm(which) {
+      this.dialogFormVisible = false
       this.dialogFormVisibleAdd = false
+      this.$refs[which].resetFields()
     },
     formatRoles(row, column) {
       var rolesName = []
@@ -253,7 +342,8 @@ export default {
       const para = {
         page: this.page,
         name: this.filters.name,
-        status: this.filters.userStatus
+        status: this.filters.userStatus,
+        order: this.orderBy
       }
 
       getUserListPage(para).then(res => {
@@ -293,10 +383,6 @@ export default {
         re_password: '',
         user_roles: JSON.parse(row.roles).map(Number)
       }
-
-      setTimeout(() => {
-        this.$refs.editForm.clearValidate()
-      }, 100)
     },
     // 显示新增界面
     handleAdd() {
@@ -397,6 +483,10 @@ export default {
       getRoleTotal().then(res => {
         this.total_roles = res.roles
       })
+    },
+    sortChange(column) {
+      this.orderBy = column.prop === null || column.order === null ? '' : column.prop + '|' + column.order
+      this.getUsers()
     }
   },
   mounted() {
@@ -410,5 +500,30 @@ export default {
 .el-form-permisson-item{
   max-height: 300px;
   overflow-y: scroll;
+}
+.pwd {
+  margin-right: 2px;
+  width: 30px;
+}
+.pwd-str {
+  width: 100px;
+  text-align: center;
+  position: relative;
+  top: -12px;
+  left: 45px;
+}
+.pwd-color {
+  border:1px solid #dcdfe6;
+  height: 10px;
+  width: 30px;
+}
+.danger {
+  background: #f80505;
+}
+.warning {
+  background: #fbc676;
+}
+.success {
+  background: #67C23A;
 }
 </style>

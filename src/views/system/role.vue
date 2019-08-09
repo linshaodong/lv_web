@@ -43,7 +43,7 @@
     </el-pagination>
 
 		<!--编辑界面-->
-		<el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :close-on-click-modal="false" width="50%">
+		<el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :show-close="false" width="50%">
 			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
 				<el-form-item label="角色名称" prop="name">
 					<el-input v-model="editForm.name" auto-complete="off"></el-input>
@@ -64,9 +64,9 @@
 
 			</el-form>
 			<div slot="footer" class="dialog-footer">
-			 <el-button @click.native="dialogFormVisible=false">取消</el-button>
-			    <el-button v-if="dialogStatus=='create'" type="primary" @click="createData">添加</el-button>
-                <el-button v-else type="primary" @click="updateData">修改</el-button>
+			 <el-button @click.native="resetForm()">取消</el-button>
+			  <el-button v-if="dialogStatus=='create'" type="primary" @click="createData">添加</el-button>
+        <el-button v-else type="primary" @click="updateData">修改</el-button>
 			</div>
 		</el-dialog>
 	</section>
@@ -125,6 +125,10 @@ export default {
     }
   },
   methods: {
+    resetForm() {
+      this.dialogFormVisible = false
+      this.$refs['editForm'].resetFields()
+    },
     // 权限选择
     rolePermissionsChange(data, checked, indeterminate) {
       console.log(data, checked, indeterminate)

@@ -5,9 +5,9 @@ import { asyncRouterMap, constantRouterMap } from '@/router'
  * @param roles
  * @param route
  */
-function hasPermission(permissions, route) {
+function hasPermission(navs, route) {
   if (route.meta && route.key) {
-    return permissions.indexOf(parseInt(route.key)) >= 0
+    return navs.indexOf(route.key) >= 0
   } else {
     return true
   }
@@ -16,13 +16,13 @@ function hasPermission(permissions, route) {
 /**
  * 递归过滤异步路由表，返回符合用户角色权限的路由表
  * @param asyncRouterMap
- * @param permissions
+ * @param navs
  */
-function filterAsyncRouter(asyncRouterMap, permissions) {
+function filterAsyncRouter(asyncRouterMap, navs) {
   const accessedRouters = asyncRouterMap.filter(route => {
-    if (hasPermission(permissions, route)) {
+    if (hasPermission(navs, route)) {
       if (route.children && route.children.length) {
-        route.children = filterAsyncRouter(route.children, permissions)
+        route.children = filterAsyncRouter(route.children, navs)
       }
       return true
     }
@@ -46,12 +46,12 @@ const permission = {
     GenerateRoutes({ commit }, data) {
       return new Promise(resolve => {
         const roles = data.data.roles
-        const permissions = data.data.permissions
+        const navs = data.data.nav
         let accessedRouters
         if (roles.indexOf('admin') >= 0) {
           accessedRouters = asyncRouterMap
         } else {
-          accessedRouters = filterAsyncRouter(asyncRouterMap, permissions)
+          accessedRouters = filterAsyncRouter(asyncRouterMap, navs)
         }
         commit('SET_ROUTERS', accessedRouters)
         resolve()

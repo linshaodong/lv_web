@@ -6,7 +6,7 @@ import VCharts from 'v-charts'
 import BaiduMap from 'vue-baidu-map'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-import locale from 'element-ui/lib/locale/lang/en' // lang i18n
+// import locale from 'element-ui/lib/locale/lang/en' // lang i18n
 import '../static/css/iconfont/1.0.0/index.css' /* icofont*/
 
 // css
@@ -52,7 +52,7 @@ Object.keys(filters).forEach(key => {
 
 Vue.use(VCharts)
 Vue.use(contentmenu)
-Vue.use(ElementUI, { locale })
+// Vue.use(ElementUI, { locale })
 iconfontVersion.forEach(ele => {
   loadStyle(iconfontUrl.replace('$key', ele))
 })

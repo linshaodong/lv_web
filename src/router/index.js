@@ -66,7 +66,7 @@ export const asyncRouterMap = [
     component: Layout,
     redirect: 'noredirect',
     name: '系统管理',
-    key: '1', // 权限判断使用
+    key: 'System', // 权限判断使用
     meta: {
       title: '系统管理',
       icon: 'tree'
@@ -75,7 +75,7 @@ export const asyncRouterMap = [
       path: 'permission',
       component: () => import('@/views/system/permission'),
       name: '权限列表',
-      key: '21',
+      key: '@Get:lv_permissions',
       meta: {
         title: '权限列表',
         icon: 'lock'
@@ -84,7 +84,7 @@ export const asyncRouterMap = [
       path: 'role',
       component: () => import('@/views/system/role'),
       name: '角色列表',
-      key: '7',
+      key: '@Get:lv_roles',
       meta: {
         title: '角色列表',
         icon: 'table'
@@ -121,7 +121,7 @@ export const asyncRouterMap = [
       path: 'user',
       component: () => import('@/views/system/user'),
       name: '用户列表',
-      key: '33',
+      key: '@Get:lv_users',
       meta: {
         title: '用户列表',
         icon: 'peoples'
@@ -151,7 +151,7 @@ export const asyncRouterMap = [
       path: 'log',
       component: () => import('@/views/system/log'),
       name: '操作日志',
-      key: '13',
+      key: '@Get:lv_logs',
       meta: {
         title: '操作日志',
         icon: 'form'

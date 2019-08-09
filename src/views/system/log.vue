@@ -40,7 +40,7 @@
 			</el-table-column>
       <el-table-column prop="ip" label="操作人员ip">
 			</el-table-column>
-      <el-table-column prop="request" label="操作信息"  :formatter="formatterRequest">
+      <el-table-column prop="request.name" label="操作权限">
 			</el-table-column>
       <el-table-column prop="response" label="操作结果" :formatter="formatterResponse">
 			</el-table-column>
@@ -67,10 +67,12 @@
 </template>
 
 <script>
-import { asyncRouterMap } from '@/router/index.js'
 import {
   getLogListPage
 } from '@/api/log-table'
+import {
+  getTotal as getPermissionTotal
+} from '@/api/permission-table'
 
 export default {
   data() {
@@ -98,42 +100,9 @@ export default {
       tmp['response'] = JSON.stringify(row.response)
       this.detailData.push(tmp)
     },
-    formatterRequest(row, column, cellValue, index) {
-      var url = row['request']['url']
-      var urlArr = url.split('/')
-      var pathTmp = ''
-      var path = ''
-      for (var i = 1; i < urlArr.length; i++) {
-        if (i === 1) {
-          var permissions = asyncRouterMap
-          pathTmp = urlArr[i]
-        } else {
-          pathTmp = pathTmp + '_' + urlArr[i]
-        }
-
-        for (var j = 0; j < permissions.length; j++) {
-          if (permissions[j].key === pathTmp) {
-            if (path === '') {
-              path += permissions[j]['name']
-            } else {
-              path += ' > ' + permissions[j]['name']
-            }
-
-            if (permissions[j].children === undefined || permissions[j].children === 'undefined') {
-              permissions = []
-            } else {
-              permissions = permissions[j].children
-            }
-          }
-        }
-      }
-
-      var str = path
-      return str
-    },
     formatterResponse(row, column, cellValue, index) {
       var str = ''
-      if (row['response']['code'] === 0) {
+      if (parseInt(row['response']['code']) === 200) {
         str += '成功'
       } else {
         str += '失败\r\n'
@@ -142,17 +111,12 @@ export default {
 
       return str
     },
-    handleItemChange(e) {
-      var index = e.length - 1
-      this.filters.permission = e[index]
-    },
     // 获取列表
     handleCurrentChange(val) {
       this.page = val
       this.getLogs()
     },
     getLogs() {
-      this.permissionOptions = this.initPermission(asyncRouterMap)
       const para = {
         page: this.page,
         user_name: this.filters.user_name,
@@ -169,7 +133,7 @@ export default {
       var permissionOptions = []
       for (var i = 0; i < e.length; i++) {
         var tmp = []
-        tmp['value'] = e[i].key
+        tmp['value'] = e[i].id_path === '' ? e[i].id : e[i].id_path + '|' + e[i].id
         tmp['label'] = e[i].name
 
         if (e[i].children !== null && e[i].children !== undefined) {
@@ -180,9 +144,24 @@ export default {
       }
 
       return permissionOptions
+    },
+    handleItemChange(e) {
+      var index = e.length - 1
+      this.filters.permission = e[index]
+      console.log(this.filters.permission)
+    },
+    getSelect() {
+      getPermissionTotal().then(res => {
+        var permissions = res.list
+        this.permissionOptions = this.initPermission(permissions)
+      }).catch(() => {
+
+      })
     }
   },
   mounted() {
+    this.getSelect()
+
     this.getLogs()
   }
 }
