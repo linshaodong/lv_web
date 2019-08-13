@@ -1,13 +1,14 @@
 import request from '@/utils/request'
 import store from '@/store'
 
-export function login(user_name, password) {
+export function login(user_name, password, vcode) {
   return request({
     url: '/lv/tokens',
     method: 'post',
     data: {
       user_name,
-      password
+      password,
+      vcode
     }
   })
 }

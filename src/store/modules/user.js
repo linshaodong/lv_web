@@ -79,9 +79,10 @@ const user = {
   actions: {
     // 登录
     Login({ commit }, userInfo) {
+      console.log(userInfo)
       const user_name = userInfo.user_name.trim()
       return new Promise((resolve, reject) => {
-        login(user_name, userInfo.password).then(response => {
+        login(user_name, userInfo.password, userInfo.vcode).then(response => {
           const data = response
           setToken(data.token)
           commit('SET_TOKEN', data.token)

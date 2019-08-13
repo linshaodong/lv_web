@@ -56,8 +56,8 @@
 
     <el-dialog title="详情" :visible.sync="dialogTableVisible">
       <el-table :data="detailData" style="width: 100%">
-        <el-table-column property="request" label="请求信息" style="width: 50%"></el-table-column>
-        <el-table-column property="response" label="返回结果" style="width: 50%"></el-table-column>
+        <el-table-column prop="request" label="请求信息" style="width: 50%"></el-table-column>
+        <el-table-column prop="response" label="返回结果" style="width: 50%"></el-table-column>
       </el-table>
     </el-dialog>
 		<!--页码-->
@@ -95,6 +95,7 @@ export default {
     detail(index, row) {
       this.dialogTableVisible = true
 
+      this.detailData = []
       var tmp = []
       tmp['request'] = row.request.url + '\r\n' + JSON.stringify(row.request.param)
       tmp['response'] = JSON.stringify(row.response)

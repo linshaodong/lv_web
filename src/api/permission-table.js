@@ -19,7 +19,7 @@ export function editPermission(params) {
   return request({
     url: '/lv/permissions/' + params['id'],
     method: 'patch',
-    params: params
+    data: params
   })
 }
 

@@ -1,5 +1,4 @@
 import request from '@/utils/request'
-import store from '@/store'
 
 export function getRoleTotal() {
   return request({
@@ -31,13 +30,13 @@ export function editRole(id, params) {
   return request({
     url: '/lv/roles/' + id,
     method: 'put',
-    params: params
+    data: params
   })
 }
 export function addRole(params) {
   return request({
     url: '/lv/roles',
     method: 'post',
-    params: params
+    data: params
   })
 }

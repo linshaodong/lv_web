@@ -24,13 +24,13 @@ export function editUser(params) {
   return request({
     url: '/lv/users/' + params['id'],
     method: 'put',
-    params: params
+    data: params
   })
 }
 export function addUser(params) {
   return request({
     url: '/lv/users',
     method: 'post',
-    params: params
+    data: params
   })
 }
