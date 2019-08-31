@@ -43,7 +43,11 @@
     </el-pagination>
 
 		<!--编辑界面-->
-		<el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" :show-close="false" width="50%">
+		<el-dialog
+     :title="textMap[dialogStatus]"
+     :visible.sync="dialogFormVisible"
+     :close-on-click-modal="false"
+     :show-close="false" width="50%">
 			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
 				<el-form-item label="角色名称" prop="name">
 					<el-input v-model="editForm.name" auto-complete="off"></el-input>

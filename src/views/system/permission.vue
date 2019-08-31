@@ -221,7 +221,7 @@ export default {
       this.dialogFormVisible = true
 
       this.editForm = {
-        is_show: row.is_show,
+        is_show: parseInt(row.is_show),
         icon: row.icon
       }
 
@@ -231,7 +231,7 @@ export default {
       }, 100)
     },
     isShow(row, column) {
-      return row.is_show === 0 ? '否' : '是'
+      return parseInt(row.is_show) === 0 ? '否' : '是'
     },
     getList() {
       const para = {

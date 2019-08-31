@@ -55,64 +55,24 @@
     <el-pagination background layout="prev, pager, next" @current-change="handleCurrentChange" :page-size="20" :total="total" style="text-align:center;margin-top:10px">
     </el-pagination>
         <!--新增界面-->
-		<el-dialog v-if="dialogStatus=='create'" 
-      :title="textMap[dialogStatus]" 
-      :visible.sync="dialogFormVisibleAdd" 
-      :show-close="false" 
-      width="50%">
-			<el-form :model="addForm" label-width="80px" :rules="addFormRules" ref="addForm">
-				<el-form-item label="姓名" prop="name">
-					<el-input v-model="addForm.name" auto-complete="off"></el-input>
-				</el-form-item>
-
-        <el-form-item label="用户名" prop="user_name">
-					<el-input v-model="addForm.user_name" auto-complete="off"></el-input>
-				</el-form-item>
-
-        <el-form-item label="密码" prop="password">
-					<el-input v-model="addForm.password" type="password" auto-complete="off" style="width:50%; float:left;"></el-input>
-          <el-row type="flex" class="row-bg" style="width:50%; float:left;top:25px;padding-left: 5px;">
-            <el-col class="pwd"><div :class="pwd1"></div></el-col>
-            <el-col class="pwd"><div :class="pwd2"></div></el-col>
-            <el-col class="pwd"><div :class="pwd3"></div></el-col>
-          </el-row>
-          <span class="pwd-str">{{ pwdLevel }}</span>
-				</el-form-item>
-
-        <el-form-item label="重复密码" prop="re_password">
-					<el-input v-model="addForm.re_password" type="password" auto-complete="off"></el-input>
-				</el-form-item>
-
-        <el-form-item label="角色" prop="roles">
-            <el-checkbox-group 
-                v-model="addForm.user_roles">
-                <el-checkbox v-for="role in total_roles" :label="role.id" :key="role.id">{{role.name}}</el-checkbox>
-            </el-checkbox-group>
-        </el-form-item>
-
-			</el-form>
-			<div slot="footer" class="dialog-footer">
-			 <el-button @click.native="resetForm('addForm')">取消</el-button>
-			    <el-button type="primary" @click="createData">添加</el-button>
-			</div>
-		</el-dialog>
-
+		
 		<!--编辑界面-->
-		<el-dialog v-if="dialogStatus!='create'" 
+		<el-dialog 
       :title="textMap[dialogStatus]" 
       :visible.sync="dialogFormVisible" 
       :show-close="false" 
+      :close-on-click-modal="false"
       width="50%">
-			<el-form :model="editForm" label-width="80px" :rules="editFormRules" ref="editForm">
+			<el-form :model="form" label-width="80px" :rules="formRules" ref="form">
 				<el-form-item label="姓名" prop="name">
-					<el-input v-model="editForm.name" auto-complete="off"></el-input>
+					<el-input v-model="form.name" auto-complete="off"></el-input>
 				</el-form-item>
 
         <el-form-item label="用户名" prop="user_name">
-					<el-input v-model="editForm.user_name" auto-complete="off"></el-input>
+					<el-input v-model="form.user_name" auto-complete="off"></el-input>
 				</el-form-item>
         <el-form-item label="状态" prop="status">
-          <el-select v-model="editForm.status" placeholder="请选择">
+          <el-select v-model="form.status" placeholder="请选择">
             <el-option
               v-for="item in userStatus"
               :key="item.value"
@@ -123,7 +83,7 @@
         </el-form-item>
 
         <el-form-item label="密码" prop="password">
-					<el-input v-model="editForm.password" type="password" auto-complete="off"  style="width:50%; float:left;"></el-input>
+					<el-input v-model="form.password" type="password" auto-complete="off"  style="width:50%; float:left;"></el-input>
           <el-row type="flex" class="row-bg" style="width:50%; float:left;top:25px;padding-left: 5px;">
             <el-col class="pwd"><div :class="pwd1"></div></el-col>
             <el-col class="pwd"><div :class="pwd2"></div></el-col>
@@ -133,20 +93,21 @@
 				</el-form-item>
 
         <el-form-item label="重复密码" prop="re_password">
-					<el-input v-model="editForm.re_password" type="password" auto-complete="off"></el-input>
+					<el-input v-model="form.re_password" type="password" auto-complete="off"></el-input>
 				</el-form-item>
 
         <el-form-item label="角色" prop="roles">
             <el-checkbox-group 
-                v-model="editForm.user_roles">
+                v-model="form.user_roles">
                 <el-checkbox v-for="role in total_roles" :label="role.id" :key="role.id">{{role.name}}</el-checkbox>
             </el-checkbox-group>
         </el-form-item>
 
 			</el-form>
 			<div slot="footer" class="dialog-footer">
-			 <el-button @click.native="resetForm('editForm')">取消</el-button>
-                <el-button type="primary" @click="updateData">修改</el-button>
+			 <el-button @click.native="resetForm()">取消</el-button>
+       <el-button v-if="dialogStatus=='create'" type="primary" @click="createData">添加</el-button>
+       <el-button v-else type="primary" @click="updateData">修改</el-button>
 			</div>
 		</el-dialog>
 	</section>
@@ -172,7 +133,6 @@ export default {
         return callback()
       }
 
-      console.log(rule)
       if (value.length <= 8) {
         this.pwdLevel = ''
         this.pwd1 = 'grid-content bg-purple pwd-color'
@@ -220,7 +180,7 @@ export default {
     }
 
     var rePwd = (rule, value, callback) => {
-      var pwd = this.addForm.password !== '' ? this.addForm.password : this.editForm.password
+      var pwd = this.form.password 
 
       if (value !== pwd) {
         return callback(new Error('俩次密码不一致'))
@@ -248,7 +208,6 @@ export default {
         update: '编辑用户',
         create: '创建用户'
       },
-      dialogFormVisibleAdd: false,
       dialogFormVisible: false,
       filtersStatus: [{
         value: -1,
@@ -275,7 +234,7 @@ export default {
       orderBy: '',
 
       // 编辑界面数据
-      editForm: {
+      form: {
         name: '',
         user_name: '',
         status: 1,
@@ -283,39 +242,26 @@ export default {
         re_password: '',
         user_roles: []
       },
-      editFormRules: {
+      formRules: {
         name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
         user_name: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
         user_roles: [{ required: true, message: '请选择角色', trigger: 'blur' }],
         password: [
-          { required: false, validator: checkPwd, trigger: 'blur' }
-        ],
-        re_password: [{ required: false, validator: rePwd, trigger: 'blur' }]
-      },
-
-      addForm: {
-        name: '',
-        user_name: '',
-        password: '',
-        re_password: '',
-        user_roles: []
-      },
-      addFormRules: {
-        name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
-        user_name: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-        password: [
           { required: true, validator: checkPwd, trigger: 'blur' }
         ],
-        re_password: [{ required: true, validator: rePwd, trigger: 'blur' }],
-        user_roles: [{ required: true, message: '请选择角色', trigger: 'blur' }]
+        re_password: [{ true: false, validator: rePwd, trigger: 'blur' }]
       }
     }
   },
   methods: {
-    resetForm(which) {
+    resetForm() {
+      this.pwdLevel = ''
+      this.pwd1 = 'grid-content bg-purple pwd-color'
+      this.pwd2 = 'grid-content bg-purple pwd-color'
+      this.pwd3 = 'grid-content bg-purple pwd-color'
+
       this.dialogFormVisible = false
-      this.dialogFormVisibleAdd = false
-      this.$refs[which].resetFields()
+      this.$refs['form'].resetFields()
     },
     formatRoles(row, column) {
       var rolesName = []
@@ -331,7 +277,7 @@ export default {
       return rolesName.join(',')
     },
     formatStatus(row, column) {
-      return row.status === 1 ? '正常' : row.status === 2 ? '锁定' : '异常'
+      return parseInt(row.status) === 1 ? '正常' : parseInt(row.status) === 2 ? '锁定' : '异常'
     },
     // 获取用户列表
     handleCurrentChange(val) {
@@ -373,41 +319,50 @@ export default {
     handleEdit(index, row) {
       this.defaultId = row.id
       this.dialogStatus = 'update'
-      this.dialogFormVisible = true
 
-      this.editForm = {
+      this.form = {
         name: row.name,
         user_name: row.user_name,
-        status: row.status,
+        status: parseInt(row.status),
         password: '',
         re_password: '',
         user_roles: JSON.parse(row.roles).map(Number)
       }
+
+      this.formRules.password[0].required = false
+
+      this.dialogFormVisible = true
     },
     // 显示新增界面
     handleAdd() {
       this.defaultId = 0
       this.dialogStatus = 'create'
-      this.dialogFormVisibleAdd = true
-      this.addForm = {
+
+      this.form = {
         name: '',
         user_name: '',
+        status: 1,
         password: '',
         re_password: '',
         user_roles: []
       }
+
+      this.formRules.password[0].required = true
+
+      this.dialogFormVisible = true
     },
     // 编辑
     updateData() {
-      if (this.addForm.password !== '' && this.addForm.password !== this.addForm.re_password) {
+      if (this.form.password !== '' && this.form.password !== this.form.re_password) {
         this.$message.error('俩次密码不一致')
         return false
       }
-      this.$refs.editForm.validate(valid => {
+
+      this.$refs.form.validate(valid => {
         if (valid) {
           this.$confirm('确认提交吗？', '提示', {})
             .then(() => {
-              const para = Object.assign({}, this.editForm)
+              const para = Object.assign({}, this.form)
               para.id = this.defaultId
 
               editUser(para).then(res => {
@@ -415,8 +370,8 @@ export default {
                   message: '提交成功',
                   type: 'success'
                 })
-                this.$refs['editForm'].resetFields()
-                this.dialogFormVisible = false
+                
+                this.resetForm()
                 this.getUsers()
               })
             })
@@ -429,29 +384,30 @@ export default {
     },
     // 新增
     createData: function() {
-      if (this.addForm.password !== this.addForm.re_password) {
+      if (this.form.password !== this.form.re_password) {
         this.$message.error('俩次密码不一致')
         return false
       }
-      this.$refs.addForm.validate(valid => {
+
+      this.$refs.form.validate(valid => {
         if (valid) {
           this.$confirm('确认提交吗？', '提示', {})
             .then(() => {
-              this.addForm.id = (parseInt(Math.random() * 100)).toString() // mock a id
-              const para = Object.assign({}, this.addForm)
+              this.form.id = (parseInt(Math.random() * 100)).toString() // mock a id
+              const para = Object.assign({}, this.form)
               addUser(para).then(res => {
                 this.$message({
                   message: '提交成功',
                   type: 'success'
                 })
-                this.$refs['addForm'].resetFields()
-                this.dialogFormVisibleAdd = false
+                
+                this.resetForm()
                 this.getUsers()
               })
             })
             .catch(e => {
               // 打印一下错误
-              this.dialogFormVisibleAdd = false
+              this.resetForm()
               console.log(e)
             })
         }
