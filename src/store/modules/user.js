@@ -1,5 +1,10 @@
 import { login, logout, getInfo } from '@/api/login'
-import { getToken, setToken, removeToken } from '@/utils/auth'
+import Cookies from 'js-cookie'
+import {
+  setToken,
+  removeToken,
+  getUserId
+} from '@/utils/auth'
 import {
   setStore,
   getStore,
@@ -7,7 +12,7 @@ import {
 } from '@/utils/store'
 const user = {
   state: {
-    token: getToken(),
+    token: '',
     userId: 0,
     name: '',
     avatar: '',
@@ -25,24 +30,54 @@ const user = {
   },
 
   mutations: {
+    LOG_OUT: (state) => {
+      removeToken()
+      Cookies.remove('userId')
+      Cookies.remove('name')
+      Cookies.remove('roles')
+      Cookies.remove('permissions')
+
+      state = {
+        token: '',
+        userId: 0,
+        name: '',
+        avatar: '',
+        roles: [],
+        permissions: [],
+        isLock: getStore({
+          name: 'isLock'
+        }) || false,
+        lockPasswd: getStore({
+          name: 'lockPasswd'
+        }) || '',
+        browserHeaderTitle: getStore({
+          name: 'browserHeaderTitle'
+        }) || 'NxAdmin'
+      }
+    },
     SET_TOKEN: (state, token) => {
       state.token = token
+      setToken(token)
     },
     SET_USER_ID: (state, token) => {
       var arr = token.split('|')
       state.userId = arr[2]
+      Cookies.set('userId', arr[2])
     },
     SET_NAME: (state, name) => {
       state.name = name
+      Cookies.set('name', name)
     },
     SET_AVATAR: (state, avatar) => {
       state.avatar = avatar
     },
     SET_ROLES: (state, roles) => {
       state.roles = roles
+      Cookies.set('roles', roles)
     },
     SET_PERMISSIONS: (state, permissions) => {
       state.permissions = permissions
+      Cookies.set('permissions', permissions)
     },
     SET_LOCK_PASSWD: (state, lockPasswd) => {
       state.lockPasswd = lockPasswd
@@ -79,12 +114,10 @@ const user = {
   actions: {
     // 登录
     Login({ commit }, userInfo) {
-      console.log(userInfo)
       const user_name = userInfo.user_name.trim()
       return new Promise((resolve, reject) => {
         login(user_name, userInfo.password, userInfo.vcode).then(response => {
           const data = response
-          setToken(data.token)
           commit('SET_TOKEN', data.token)
           commit('SET_USER_ID', data.token)
           resolve()
@@ -97,7 +130,7 @@ const user = {
     // 获取用户信息
     GetInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
-        getInfo(state.token).then(response => {
+        getInfo(getUserId()).then(response => {
           const data = response
           if (data.roles && data.roles.length > 0) { // 验证返回的roles是否是一个非空数组
             commit('SET_ROLES', data.roles)
@@ -105,7 +138,7 @@ const user = {
           } else {
             reject('getInfo: roles must be a non-null array !')
           }
-          commit('SET_NAME', data.name)
+          commit('SET_NAME', data.user_name)
           commit('SET_AVATAR', data.avatar)
           resolve(response)
         }).catch(error => {
@@ -117,11 +150,8 @@ const user = {
     // 登出
     LogOut({ commit, state }) {
       return new Promise((resolve, reject) => {
-        logout(state.token).then(() => {
-          commit('SET_TOKEN', '')
-          commit('SET_ROLES', [])
-          commit('CLEAR_LOCK')
-          removeToken()
+        logout(getUserId()).then(() => {
+          commit('LOG_OUT')
           resolve()
         }).catch(error => {
           reject(error)
@@ -132,23 +162,8 @@ const user = {
     // 前端 登出
     FedLogOut({ commit }) {
       return new Promise(resolve => {
-        commit('SET_TOKEN', '')
-        removeToken()
+        commit('LOG_OUT')
         resolve()
-      })
-    },
-    // 动态修改权限
-    ChangeRoles({ commit }, role) {
-      return new Promise(resolve => {
-        commit('SET_TOKEN', role)
-        setToken(role)
-        getInfo(role).then(response => {
-          const data = response
-          commit('SET_ROLES', data.roles)
-          commit('SET_NAME', data.name)
-          commit('SET_AVATAR', data.avatar)
-          resolve()
-        })
       })
     }
   }

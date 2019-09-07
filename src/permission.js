@@ -3,7 +3,10 @@ import store from './store'
 import NProgress from 'nprogress' // Progress 进度条
 import 'nprogress/nprogress.css'// Progress 进度条样式
 import { Message } from 'element-ui'
-import { getToken } from '@/utils/auth' // 验权
+import {
+  getToken,
+  getRoles
+} from '@/utils/auth' // 验权
 import {
   setTitle
 } from '@/utils/util' // 设置浏览器头部标题
@@ -33,7 +36,8 @@ router.beforeEach((to, from, next) => {
       next({ path: '/' })
       NProgress.done() // if current page is dashboard will not trigger	afterEach hook, so manually handle it
     } else {
-      if (store.getters.roles.length === 0) {
+      const roles = getRoles()
+      if (roles.length === 0) {
         store.dispatch('GetInfo').then(res => { // 拉取用户信息
           const data = res // note: roles must be a array! such as: ['editor','develop']
           store.dispatch('GenerateRoutes', { data }).then(() => { // 根据roles权限生成可访问的路由表
@@ -41,14 +45,17 @@ router.beforeEach((to, from, next) => {
             next({ ...to, replace: true }) // hack方法 确保addRoutes已完成 ,set the replace: true so the navigation will not leave a history record
           })
         }).catch((err) => {
+          Message.error('系统异常')
+
           store.dispatch('FedLogOut').then(() => {
-            Message.error(err || 'Verification failed, please login again')
+            console.log(err)
+            // Message.error('系统异常')
             next({ path: '/' })
           })
         })
       } else {
         // 没有动态改变权限的需求可直接next() 删除下方权限判断 ↓
-        if (hasPermission(store.getters.roles, to.meta.roles)) {
+        if (hasPermission(roles, to.meta.roles)) {
           next()//
         } else {
           next({ path: '/401', replace: true, query: { noGoBack: true }})

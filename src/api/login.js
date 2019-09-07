@@ -1,5 +1,4 @@
 import request from '@/utils/request'
-import store from '@/store'
 
 export function login(user_name, password, vcode) {
   return request({
@@ -13,16 +12,16 @@ export function login(user_name, password, vcode) {
   })
 }
 
-export function getInfo() {
+export function getInfo(userId) {
   return request({
-    url: '/lv/users/' + store.getters.userId,
+    url: '/lv/users/' + userId,
     method: 'get'
   })
 }
 
-export function logout() {
+export function logout(userId) {
   return request({
-    url: '/lv/tokens/' + store.getters.userId,
+    url: '/lv/tokens/' + userId,
     method: 'delete'
   })
 }
