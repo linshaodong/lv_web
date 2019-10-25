@@ -1,4 +1,20 @@
-本项目为《通用管理后台》前端vue，需要配合服务端（https://github.com/linshaodong/lv_api），才能使用整套功能。
+本项目为《通用管理后台》服务端api，需要配合前端vue（https://github.com/linshaodong/lv_web），才能使用整套功能。
+
+本项目已实现功能：
+1. 服务端api
+    - 用户登录
+    - 系统管理
+        - 角色管理
+        - 权限管理
+        - 用户管理
+        - 操作日志
+    - 个人信息修改
+    - 上传
+    - swoole 即时聊天
+    - 验证码
+
+2. 前端
+    vue2.x + element_ui
 
 后台权限控制：
 	通过代码的注释反射实现权限控制功能
